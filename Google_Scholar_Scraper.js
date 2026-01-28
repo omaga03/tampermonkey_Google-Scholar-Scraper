@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Google Scholar Scraper V.17
+// @name         Google Scholar Scraper V.18
 // @namespace    http://tampermonkey.net/
 // @version      18.0
 // @description  Google Scholar Scraper with 3 modes (Profile/Basic/Deep), Author validation, and CSV Export.
