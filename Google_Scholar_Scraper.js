@@ -52,7 +52,7 @@ function createUI() {
         });
 
         const title = document.createElement('div');
-        title.innerText = '🤖 Scholar Tools';
+        title.innerText = '🤖 Scholar Tools v${scriptVersion}';
         Object.assign(title.style, {
             fontSize: '12px',
             fontWeight: 'bold',
