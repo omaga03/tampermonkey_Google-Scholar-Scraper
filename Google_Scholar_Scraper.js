@@ -52,11 +52,9 @@
             fontFamily: "'Sarabun', sans-serif"
         });
 
-        // ดึงเลขเวอร์ชันจาก Metadata
         const scriptVersion = (typeof GM_info !== 'undefined') ? GM_info.script.version : '19.0';
 
         const title = document.createElement('div');
-        // แสดงชื่อพร้อมเลขเวอร์ชัน
         title.innerText = `🤖 Scholar Tools v${scriptVersion}`;
         Object.assign(title.style, {
             fontSize: '12px',
