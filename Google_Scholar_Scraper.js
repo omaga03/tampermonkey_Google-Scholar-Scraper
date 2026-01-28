@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Google Scholar Scraper V.18
+// @name         Google Scholar Scraper V.19
 // @namespace    http://tampermonkey.net/
-// @version      18
+// @version      19.0
 // @description  Google Scholar Scraper with 3 modes (Profile/Basic/Deep), Author validation, and CSV Export.
 // @author       OmaGa03-RDI-PCRU
 // @match        https://scholar.google.com/citations?*
@@ -32,7 +32,7 @@
         createUI();
     });
 
-function createUI() {
+    function createUI() {
         const container = document.createElement('div');
         Object.assign(container.style, {
             position: 'fixed',
@@ -43,19 +43,21 @@ function createUI() {
             flexDirection: 'column',
             gap: '12px',
             padding: '20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)', 
-            backdropFilter: 'blur(10px)', 
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(10px)',
             borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', 
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
             transition: 'all 0.3s ease',
-            fontFamily: "'Sarabun', sans-serif" 
+            fontFamily: "'Sarabun', sans-serif"
         });
 
-        const scriptVersion = (typeof GM_info !== 'undefined') ? GM_info.script.version : '18.0';
+        // ดึงเลขเวอร์ชันจาก Metadata
+        const scriptVersion = (typeof GM_info !== 'undefined') ? GM_info.script.version : '19.0';
 
         const title = document.createElement('div');
-        title.innerText = '🤖 Scholar Tools v${scriptVersion}';
+        // แสดงชื่อพร้อมเลขเวอร์ชัน
+        title.innerText = `🤖 Scholar Tools v${scriptVersion}`;
         Object.assign(title.style, {
             fontSize: '12px',
             fontWeight: 'bold',
@@ -69,25 +71,25 @@ function createUI() {
 
         function createStylishButton(text, gradientColors, onClick) {
             const btn = document.createElement('button');
-            btn.innerHTML = text; 
+            btn.innerHTML = text;
             Object.assign(btn.style, {
                 padding: '12px 24px',
-                background: `linear-gradient(135deg, ${gradientColors[0]}, ${gradientColors[1]})`, // ไล่สี
+                background: `linear-gradient(135deg, ${gradientColors[0]}, ${gradientColors[1]})`,
                 color: 'white',
                 border: 'none',
-                borderRadius: '50px', 
+                borderRadius: '50px',
                 cursor: 'pointer',
                 fontWeight: '600',
                 fontSize: '14px',
                 boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                 textAlign: 'left',
-                width: '100%', 
-                minWidth: '240px', 
-                whiteSpace: 'nowrap', 
+                width: '100%',
+                minWidth: '240px',
+                whiteSpace: 'nowrap',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px' 
+                gap: '10px'
             });
 
             btn.onmouseenter = () => {
@@ -105,7 +107,7 @@ function createUI() {
 
         const btnProfile = createStylishButton(
             '👤 1. รายชื่อ <span style="font-size:12px; opacity:0.8">(Profile)</span>',
-            ['#11998e', '#38ef7d'], 
+            ['#11998e', '#38ef7d'],
             () => startGrandProcess('profile')
         );
 
@@ -125,21 +127,6 @@ function createUI() {
         container.appendChild(btnBasic);
         container.appendChild(btnDeep);
         document.body.appendChild(container);
-    }
-
-    function styleButton(btn, bgColor) {
-        btn.style.padding = '10px 20px';
-        btn.style.backgroundColor = bgColor;
-        btn.style.color = 'white';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '50px';
-        btn.style.cursor = 'pointer';
-        btn.style.fontWeight = 'bold';
-        btn.style.fontSize = '14px';
-        btn.style.boxShadow = '0 3px 6px rgba(0,0,0,0.3)';
-        btn.style.textAlign = 'right';
-        btn.style.width = '280px';
-        btn.style.whiteSpace = 'nowrap';
     }
 
     // --- Dashboard UI ---
@@ -434,7 +421,7 @@ function createUI() {
                         row.style.backgroundColor = item.isMatch ? '#e6fffa' : '#fff5f5';
                         icon = item.isMatch ? '✅' : '❌';
                         titleStyle = item.isMatch ? '' : 'color: red; font-weight:bold;';
-                        detailText = `<div style="margin-left: 25px; color: #555; font-size: 13px;">authors: ${item.authorsInArticle}</div>`;
+                        detailText = `<div style="margin-left: 25px; color: #555; font-size: 13px;">author: ${item.authorsInArticle}</div>`;
                     } else {
                         row.style.backgroundColor = '#fff';
                     }
