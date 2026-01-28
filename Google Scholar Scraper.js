@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Google Scholar Scraper V.16 (Link Icons Added)
+// @name         Google Scholar Scraper
 // @namespace    http://tampermonkey.net/
 // @version      16.0
-// @description  เลือกได้ 3 ระดับ -> เพิ่มไอคอนลิงก์ในหน้าผลลัพธ์ -> CSV
-// @author       Gemini
+// @description  Google Scholar Scraper with 3 modes (Profile/Basic/Deep), Author validation, and CSV Export.
+// @author       OmaGa03-RDI PCRU
 // @match        https://scholar.google.com/citations?*
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
@@ -28,7 +28,6 @@
     });
 
     function createUI() {
-        // 1. สร้าง Container หลัก (กล่องรวมปุ่ม)
         const container = document.createElement('div');
         Object.assign(container.style, {
             position: 'fixed',
@@ -39,16 +38,15 @@
             flexDirection: 'column',
             gap: '12px',
             padding: '20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)', // พื้นหลังสีขาวจางๆ
-            backdropFilter: 'blur(10px)', // เอฟเฟกต์เบลอฉากหลัง (Glassmorphism)
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(10px)',
             borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', // เงานุ่มๆ
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
             transition: 'all 0.3s ease',
-            fontFamily: "'Sarabun', sans-serif" // หรือฟอนต์สวยๆ
+            fontFamily: "'Sarabun', sans-serif"
         });
 
-        // หัวข้อเล็กๆ ด้านบนกล่อง (Optional)
         const title = document.createElement('div');
         title.innerText = '🤖 Scholar Tools';
         Object.assign(title.style, {
@@ -62,31 +60,29 @@
         });
         container.appendChild(title);
 
-        // 2. ฟังก์ชันสร้างปุ่มสวยๆ
         function createStylishButton(text, gradientColors, onClick) {
             const btn = document.createElement('button');
-            btn.innerHTML = text; // ใช้ innerHTML เพื่อรองรับ icon
+            btn.innerHTML = text;
             Object.assign(btn.style, {
                 padding: '12px 24px',
                 background: `linear-gradient(135deg, ${gradientColors[0]}, ${gradientColors[1]})`, // ไล่สี
                 color: 'white',
                 border: 'none',
-                borderRadius: '50px', // ทรงแคปซูล
+                borderRadius: '50px',
                 cursor: 'pointer',
                 fontWeight: '600',
                 fontSize: '14px',
                 boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                 textAlign: 'left',
-                width: '100%', // ให้ปุ่มเต็มกล่อง
-                minWidth: '240px', // กันข้อความตก
-                whiteSpace: 'nowrap', // ห้ามตัดบรรทัดเด็ดขาด
+                width: '100%',
+                minWidth: '240px',
+                whiteSpace: 'nowrap',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px' // ระยะห่างระหว่างไอคอนกับตัวหนังสือ
+                gap: '10px'
             });
 
-            // Hover Effect (เมาส์ชี้แล้วเด้ง)
             btn.onmouseenter = () => {
                 btn.style.transform = 'translateY(-2px)';
                 btn.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
@@ -100,22 +96,21 @@
             return btn;
         }
 
-        // 3. สร้างปุ่มทั้ง 3 ระดับ (ใส่สีไล่เฉด)
         const btnProfile = createStylishButton(
             '👤 1. รายชื่อ <span style="font-size:12px; opacity:0.8">(Profile)</span>',
-            ['#11998e', '#38ef7d'], // เขียวไล่สี
+            ['#11998e', '#38ef7d'],
             () => startGrandProcess('profile')
         );
 
         const btnBasic = createStylishButton(
             '⚡ 2. บทความ <span style="font-size:12px; opacity:0.8">(Articles)</span>',
-            ['#FF8008', '#FFC837'], // ส้มไล่สีเหลือง
+            ['#FF8008', '#FFC837'],
             () => startGrandProcess('basic')
         );
 
         const btnDeep = createStylishButton(
             '🛡️ 3. ตรวจสอบ <span style="font-size:12px; opacity:0.8">(Deep Dive)</span>',
-            ['#CB356B', '#BD3F32'], // แดงไล่สีชมพูเข้ม
+            ['#CB356B', '#BD3F32'],
             () => startGrandProcess('deep')
         );
 
