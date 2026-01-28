@@ -31,27 +31,92 @@
         createUI();
     });
 
-    function createUI() {
+function createUI() {
         const container = document.createElement('div');
         Object.assign(container.style, {
-            position: 'fixed', bottom: '20px', right: '20px', zIndex: '9999',
-            display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end'
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            zIndex: '9999',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            padding: '20px',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)', 
+            backdropFilter: 'blur(10px)', 
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', 
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            transition: 'all 0.3s ease',
+            fontFamily: "'Sarabun', sans-serif" 
         });
 
-        const btnProfile = document.createElement('button');
-        btnProfile.innerText = '👤 1. รายชื่อ (Profile Only)';
-        styleButton(btnProfile, '#16a085');
-        btnProfile.onclick = () => startGrandProcess('profile');
+        const title = document.createElement('div');
+        title.innerText = '🤖 Scholar Tools';
+        Object.assign(title.style, {
+            fontSize: '12px',
+            fontWeight: 'bold',
+            color: '#555',
+            marginBottom: '5px',
+            textAlign: 'center',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+        });
+        container.appendChild(title);
 
-        const btnBasic = document.createElement('button');
-        btnBasic.innerText = '⚡ 2. บทความ (Articles Only)';
-        styleButton(btnBasic, '#f39c12');
-        btnBasic.onclick = () => startGrandProcess('basic');
+        function createStylishButton(text, gradientColors, onClick) {
+            const btn = document.createElement('button');
+            btn.innerHTML = text; 
+            Object.assign(btn.style, {
+                padding: '12px 24px',
+                background: `linear-gradient(135deg, ${gradientColors[0]}, ${gradientColors[1]})`, // ไล่สี
+                color: 'white',
+                border: 'none',
+                borderRadius: '50px', 
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '14px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                textAlign: 'left',
+                width: '100%', 
+                minWidth: '240px', 
+                whiteSpace: 'nowrap', 
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px' 
+            });
 
-        const btnDeep = document.createElement('button');
-        btnDeep.innerText = '🛡️ 3. ตรวจสอบ (Deep Dive)';
-        styleButton(btnDeep, '#c0392b');
-        btnDeep.onclick = () => startGrandProcess('deep');
+            btn.onmouseenter = () => {
+                btn.style.transform = 'translateY(-2px)';
+                btn.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+            };
+            btn.onmouseleave = () => {
+                btn.style.transform = 'translateY(0)';
+                btn.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+            };
+
+            btn.onclick = onClick;
+            return btn;
+        }
+
+        const btnProfile = createStylishButton(
+            '👤 1. รายชื่อ <span style="font-size:12px; opacity:0.8">(Profile)</span>',
+            ['#11998e', '#38ef7d'], 
+            () => startGrandProcess('profile')
+        );
+
+        const btnBasic = createStylishButton(
+            '⚡ 2. บทความ <span style="font-size:12px; opacity:0.8">(Articles)</span>',
+            ['#FF8008', '#FFC837'],
+            () => startGrandProcess('basic')
+        );
+
+        const btnDeep = createStylishButton(
+            '🛡️ 3. ตรวจสอบ <span style="font-size:12px; opacity:0.8">(Deep Dive)</span>',
+            ['#CB356B', '#BD3F32'],
+            () => startGrandProcess('deep')
+        );
 
         container.appendChild(btnProfile);
         container.appendChild(btnBasic);
