@@ -51,6 +51,8 @@ function createUI() {
             fontFamily: "'Sarabun', sans-serif" 
         });
 
+        const scriptVersion = (typeof GM_info !== 'undefined') ? GM_info.script.version : '18.0';
+
         const title = document.createElement('div');
         title.innerText = '🤖 Scholar Tools v${scriptVersion}';
         Object.assign(title.style, {
