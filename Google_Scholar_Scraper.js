@@ -6,6 +6,7 @@
 // @author       OmaGa03-RDI-PCRU
 // @match        https://scholar.google.com/citations?*
 // @grant        GM_xmlhttpRequest
+// @grant        GM_info
 // @homepageURL  https://github.com/omaga03/tampermonkey_Google-Scholar-Scraper
 // @supportURL   https://github.com/omaga03/tampermonkey_Google-Scholar-Scraper/issues
 // @updateURL    https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/Google_Scholar_Scraper.js
