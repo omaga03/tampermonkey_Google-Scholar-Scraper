@@ -8,8 +8,8 @@
 // @grant        GM_xmlhttpRequest
 // @homepageURL  https://github.com/omaga03/tampermonkey_Google-Scholar-Scraper
 // @supportURL   https://github.com/omaga03/tampermonkey_Google-Scholar-Scraper/issues
-// @updateURL    https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/script.user.js
-// @downloadURL  https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/script.user.js
+// @updateURL    https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/Google_Scholar_Scraper.js
+// @downloadURL  https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/Google_Scholar_Scraper.js
 // ==/UserScript==
 
 (function() {
