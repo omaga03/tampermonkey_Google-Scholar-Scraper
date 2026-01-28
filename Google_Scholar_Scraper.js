@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Google Scholar Scraper V.18
+// @name         Google Scholar Scraper V.18.1
 // @namespace    http://tampermonkey.net/
-// @version      18.0
+// @version      18.1
 // @description  Google Scholar Scraper with 3 modes (Profile/Basic/Deep), Author validation, and CSV Export.
 // @author       OmaGa03-RDI-PCRU
 // @match        https://scholar.google.com/citations?*
@@ -202,7 +202,7 @@ function createUI() {
             if (currentMode === 'profile') {
                 articleEl.innerText = "✅ เก็บข้อมูลโปรไฟล์เรียบร้อย";
             } else if (currentArticleTitle) {
-                const action = currentMode === 'deep' ? 'เจาะลึก' : 'ดึงข้อมูล';
+                const action = currentMode === 'deep' ? 'ตรวจสอบ' : 'ดึงข้อมูล';
                 articleEl.innerText = `📄 [${artIndex}/${artTotal}] ${action}: "${currentArticleTitle.substring(0, 30)}..."`;
             }
         }
@@ -431,7 +431,7 @@ function createUI() {
                         row.style.backgroundColor = item.isMatch ? '#e6fffa' : '#fff5f5';
                         icon = item.isMatch ? '✅' : '❌';
                         titleStyle = item.isMatch ? '' : 'color: red; font-weight:bold;';
-                        detailText = `<div style="margin-left: 25px; color: #555; font-size: 13px;">ข้อมูลดิบ: ${item.authorsInArticle}</div>`;
+                        detailText = `<div style="margin-left: 25px; color: #555; font-size: 13px;">authors: ${item.authorsInArticle}</div>`;
                     } else {
                         row.style.backgroundColor = '#fff';
                     }
