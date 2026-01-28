@@ -1,11 +1,15 @@
 // ==UserScript==
-// @name         Google Scholar Scraper
+// @name         Google Scholar Scraper V.17
 // @namespace    http://tampermonkey.net/
-// @version      16.0
+// @version      17.0
 // @description  Google Scholar Scraper with 3 modes (Profile/Basic/Deep), Author validation, and CSV Export.
-// @author       OmaGa03-RDI PCRU
+// @author       OmaGa03-RDI-PCRU
 // @match        https://scholar.google.com/citations?*
 // @grant        GM_xmlhttpRequest
+// @homepageURL  https://github.com/omaga03/tampermonkey_Google-Scholar-Scraper
+// @supportURL   https://github.com/omaga03/tampermonkey_Google-Scholar-Scraper/issues
+// @updateURL    https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/script.user.js
+// @downloadURL  https://raw.githubusercontent.com/omaga03/tampermonkey_Google-Scholar-Scraper/main/script.user.js
 // ==/UserScript==
 
 (function() {
@@ -30,89 +34,24 @@
     function createUI() {
         const container = document.createElement('div');
         Object.assign(container.style, {
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            zIndex: '9999',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            padding: '20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            transition: 'all 0.3s ease',
-            fontFamily: "'Sarabun', sans-serif"
+            position: 'fixed', bottom: '20px', right: '20px', zIndex: '9999',
+            display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end'
         });
 
-        const title = document.createElement('div');
-        title.innerText = '🤖 Scholar Tools';
-        Object.assign(title.style, {
-            fontSize: '12px',
-            fontWeight: 'bold',
-            color: '#555',
-            marginBottom: '5px',
-            textAlign: 'center',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-        });
-        container.appendChild(title);
+        const btnProfile = document.createElement('button');
+        btnProfile.innerText = '👤 1. รายชื่อ (Profile Only)';
+        styleButton(btnProfile, '#16a085');
+        btnProfile.onclick = () => startGrandProcess('profile');
 
-        function createStylishButton(text, gradientColors, onClick) {
-            const btn = document.createElement('button');
-            btn.innerHTML = text;
-            Object.assign(btn.style, {
-                padding: '12px 24px',
-                background: `linear-gradient(135deg, ${gradientColors[0]}, ${gradientColors[1]})`, // ไล่สี
-                color: 'white',
-                border: 'none',
-                borderRadius: '50px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '14px',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                textAlign: 'left',
-                width: '100%',
-                minWidth: '240px',
-                whiteSpace: 'nowrap',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px'
-            });
+        const btnBasic = document.createElement('button');
+        btnBasic.innerText = '⚡ 2. บทความ (Articles Only)';
+        styleButton(btnBasic, '#f39c12');
+        btnBasic.onclick = () => startGrandProcess('basic');
 
-            btn.onmouseenter = () => {
-                btn.style.transform = 'translateY(-2px)';
-                btn.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-            };
-            btn.onmouseleave = () => {
-                btn.style.transform = 'translateY(0)';
-                btn.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            };
-
-            btn.onclick = onClick;
-            return btn;
-        }
-
-        const btnProfile = createStylishButton(
-            '👤 1. รายชื่อ <span style="font-size:12px; opacity:0.8">(Profile)</span>',
-            ['#11998e', '#38ef7d'],
-            () => startGrandProcess('profile')
-        );
-
-        const btnBasic = createStylishButton(
-            '⚡ 2. บทความ <span style="font-size:12px; opacity:0.8">(Articles)</span>',
-            ['#FF8008', '#FFC837'],
-            () => startGrandProcess('basic')
-        );
-
-        const btnDeep = createStylishButton(
-            '🛡️ 3. ตรวจสอบ <span style="font-size:12px; opacity:0.8">(Deep Dive)</span>',
-            ['#CB356B', '#BD3F32'],
-            () => startGrandProcess('deep')
-        );
+        const btnDeep = document.createElement('button');
+        btnDeep.innerText = '🛡️ 3. ตรวจสอบ (Deep Dive)';
+        styleButton(btnDeep, '#c0392b');
+        btnDeep.onclick = () => startGrandProcess('deep');
 
         container.appendChild(btnProfile);
         container.appendChild(btnBasic);
@@ -159,20 +98,14 @@
                 <h3 style="margin:0; color:#f1c40f;">${modeText}</h3>
                 <span style="font-size:12px; color:#aaa;">Running</span>
             </div>
-
             <div id="gs-author-info" style="font-weight:bold; color:#fff; margin-bottom:5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 รอเริ่มทำงาน...
             </div>
-
-            <div id="gs-article-info" style="font-size:12px; color:#ccc; margin-bottom:15px;">
-                -
-            </div>
-
+            <div id="gs-article-info" style="font-size:12px; color:#ccc; margin-bottom:15px;">-</div>
             <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <button id="gs-btn-pause" style="flex:1; padding:8px; cursor:pointer; background:#e67e22; border:none; color:white; font-weight:bold; border-radius:4px;">⏸ พัก (Pause)</button>
                 <button id="gs-btn-stop" style="flex:1; padding:8px; cursor:pointer; background:#c0392b; border:none; color:white; font-weight:bold; border-radius:4px;">⏹ หยุด (Stop)</button>
             </div>
-
             <div style="font-size:12px; color:#aaa; text-align:center; border-top:1px solid #444; padding-top:5px;">
                 *หากเจอ CAPTCHA ให้กดพัก แก้แล้วกดทำต่อ
             </div>
@@ -211,17 +144,11 @@
     }
 
     async function smartSleep() {
-        while (isPaused) {
-            await new Promise(r => setTimeout(r, 1000));
-        }
-        if (currentMode === 'profile') {
-             await new Promise(r => setTimeout(r, 200));
-             return;
-        }
+        while (isPaused) { await new Promise(r => setTimeout(r, 1000)); }
+        if (currentMode === 'profile') { await new Promise(r => setTimeout(r, 200)); return; }
 
         let min = currentMode === 'deep' ? DELAY_DEEP_MIN : DELAY_BASIC_MIN;
         let max = currentMode === 'deep' ? DELAY_DEEP_MAX : DELAY_BASIC_MAX;
-
         const ms = Math.floor(Math.random() * (max - min + 1) + min);
         await new Promise(r => setTimeout(r, ms));
     }
@@ -255,7 +182,6 @@
             const userId = getParameterByName('user', profileUrl);
 
             updateDashboardUI(authorName, "กำลังเริ่ม...", "-", "-");
-
             let detailedArticles = [];
 
             if (mode === 'profile') {
@@ -263,7 +189,6 @@
                 await smartSleep();
             } else {
                 const articlesList = await fetchAllArticlesList(userId);
-
                 if (isStopped) break;
 
                 for (let j = 0; j < articlesList.length; j++) {
@@ -279,29 +204,14 @@
                         await smartSleep();
                         authorsInArticle = await fetchArticleDeepDetail(art.url);
                         isMatch = checkNameMatch(authorName, authorsInArticle);
-
-                        if (isMatch) globalStats.totalMatches++;
-                        else globalStats.totalMismatches++;
+                        if (isMatch) globalStats.totalMatches++; else globalStats.totalMismatches++;
                     }
-
-                    detailedArticles.push({
-                        title: art.title,
-                        url: art.url,
-                        authorsInArticle: authorsInArticle,
-                        isMatch: isMatch
-                    });
+                    detailedArticles.push({ title: art.title, url: art.url, authorsInArticle: authorsInArticle, isMatch: isMatch });
                 }
             }
-
-            masterData.push({
-                authorName: authorName,
-                profileUrl: profileUrl,
-                articles: detailedArticles
-            });
-
+            masterData.push({ authorName: authorName, profileUrl: profileUrl, articles: detailedArticles });
             await smartSleep();
         }
-
         document.getElementById('gs-dashboard').remove();
         showGrandResultModal(masterData, mode);
     }
@@ -346,10 +256,7 @@
                         const valueDiv = row.querySelector('.gsc_oci_value');
                         if (labelDiv && valueDiv) {
                             const label = labelDiv.innerText.trim().toLowerCase();
-                            if (['ผู้เขียน', 'authors', 'ผู้คิดค้น', 'inventors'].includes(label)) {
-                                foundData = valueDiv.innerText.trim();
-                                break;
-                            }
+                            if (['ผู้เขียน', 'authors', 'ผู้คิดค้น', 'inventors'].includes(label)) { foundData = valueDiv.innerText.trim(); break; }
                         }
                     }
                     resolve(foundData);
@@ -378,11 +285,7 @@
 
     function fetchHTML(url) {
         return new Promise((resolve, reject) => {
-            GM_xmlhttpRequest({
-                method: "GET", url: url,
-                onload: (res) => resolve(new DOMParser().parseFromString(res.responseText, "text/html")),
-                onerror: reject
-            });
+            GM_xmlhttpRequest({ method: "GET", url: url, onload: (res) => resolve(new DOMParser().parseFromString(res.responseText, "text/html")), onerror: reject });
         });
     }
 
@@ -395,7 +298,7 @@
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
 
-    // --- Result UI (Added Links) ---
+    // --- Result UI ---
     function showGrandResultModal(masterData, mode) {
         const modal = document.createElement('div');
         Object.assign(modal.style, {
@@ -405,14 +308,9 @@
             boxShadow: '0 0 25px rgba(0,0,0,0.5)', borderRadius: '8px', overflow: 'hidden'
         });
 
-        // Header Stats
         let statsHTML = '';
         if (mode === 'deep') {
-            statsHTML = `
-                รวม: <b>${globalStats.totalMatches + globalStats.totalMismatches}</b> บทความ |
-                <span style="color:green;">✅ ตรงกัน: <b>${globalStats.totalMatches}</b></span> |
-                <span style="color:red;">❌ ไม่ตรง: <b>${globalStats.totalMismatches}</b></span>
-            `;
+            statsHTML = `รวม: <b>${globalStats.totalMatches + globalStats.totalMismatches}</b> บทความ | <span style="color:green;">✅ ตรงกัน: <b>${globalStats.totalMatches}</b></span> | <span style="color:red;">❌ ไม่ตรง: <b>${globalStats.totalMismatches}</b></span>`;
         } else if (mode === 'basic') {
             statsHTML = `โหมดบทความ (Basic): ดึงชื่อเรื่องและ URL เท่านั้น`;
         } else {
@@ -423,10 +321,7 @@
         header.style.padding = '20px';
         header.style.backgroundColor = '#f1f3f4';
         header.style.borderBottom = '1px solid #ddd';
-        header.innerHTML = `
-            <h2 style="margin:0 0 10px 0;">สรุปผลการดึงข้อมูล (${mode === 'profile' ? 'Profile' : mode === 'basic' ? 'Basic' : 'Deep'})</h2>
-            <div>${statsHTML}</div>
-        `;
+        header.innerHTML = `<h2 style="margin:0 0 10px 0;">สรุปผลการดึงข้อมูล (${mode === 'profile' ? 'Profile' : mode === 'basic' ? 'Basic' : 'Deep'})</h2><div>${statsHTML}</div>`;
 
         const listContainer = document.createElement('div');
         listContainer.style.flex = '1';
@@ -435,22 +330,14 @@
         listContainer.style.backgroundColor = '#fafafa';
 
         masterData.forEach((person, pIdx) => {
-
-            // สร้างลิงก์โปรไฟล์
             const authorLink = `<a href="${person.profileUrl}" target="_blank" style="text-decoration:none; margin-left:5px; font-size:16px;" title="ไปที่โปรไฟล์">🔗</a>`;
-
             let articleCountText = mode === 'profile' ? '' : `(${person.articles.length} เรื่อง)`;
             let personHeaderHTML = `👤 ${pIdx+1}. ${person.authorName} ${authorLink} ${articleCountText}`;
 
             if (mode === 'deep') {
                 const localMatch = person.articles.filter(a => a.isMatch).length;
                 const localMismatch = person.articles.length - localMatch;
-                personHeaderHTML += `
-                    <span style="margin-left:15px; font-weight:normal; font-size:14px;">
-                        | <span style="color:green">✅ ตรง: <b>${localMatch}</b></span>
-                        | <span style="color:red">❌ ไม่ตรง: <b>${localMismatch}</b></span>
-                    </span>
-                `;
+                personHeaderHTML += `<span style="margin-left:15px; font-weight:normal; font-size:14px;">| <span style="color:green">✅ ตรง: <b>${localMatch}</b></span> | <span style="color:red">❌ ไม่ตรง: <b>${localMismatch}</b></span></span>`;
             }
 
             const personHeader = document.createElement('div');
@@ -470,9 +357,7 @@
                     row.style.padding = '8px 10px';
                     row.style.marginLeft = '10px';
 
-                    // สร้างลิงก์บทความ
                     const articleLink = `<a href="${item.url}" target="_blank" style="text-decoration:none; margin-left:5px; font-size:14px;" title="ไปที่บทความ">🔗</a>`;
-
                     let icon = '📄';
                     let titleStyle = '';
                     let detailText = '';
@@ -486,12 +371,7 @@
                         row.style.backgroundColor = '#fff';
                     }
 
-                    row.innerHTML = `
-                        <div style="font-size:14px; ${titleStyle}">
-                            ${icon} ${idx+1}. ${item.title} ${articleLink}
-                        </div>
-                        ${detailText}
-                    `;
+                    row.innerHTML = `<div style="font-size:14px; ${titleStyle}">${icon} ${idx+1}. ${item.title} ${articleLink}</div>${detailText}`;
                     listContainer.appendChild(row);
                 });
             }
@@ -519,12 +399,9 @@
 
         btnCsv.onclick = () => {
             let csv = "data:text/csv;charset=utf-8,\uFEFF";
-
             if (mode === 'profile') {
                  csv += "Author Name,Profile URL\n";
-                 masterData.forEach(p => {
-                     csv += `"${p.authorName}","${p.profileUrl}"\n`;
-                 });
+                 masterData.forEach(p => { csv += `"${p.authorName}","${p.profileUrl}"\n`; });
             } else {
                 csv += "Author Name,Article Title,Authors/Inventors (Fetched),Match Status,Article URL,Profile URL\n";
                 masterData.forEach(p => {
@@ -534,7 +411,6 @@
                     });
                 });
             }
-
             const link = document.createElement("a");
             link.href = encodeURI(csv);
             link.download = `scholar_result_${mode}.csv`;
@@ -550,5 +426,4 @@
         modal.appendChild(footer);
         document.body.appendChild(modal);
     }
-
 })();
