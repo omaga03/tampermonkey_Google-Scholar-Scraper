@@ -189,9 +189,16 @@
         if(articleEl) {
             if (currentMode === 'profile') {
                 articleEl.innerText = "✅ เก็บข้อมูลโปรไฟล์เรียบร้อย";
-            } else if (currentArticleTitle) {
+            } else {
                 const action = currentMode === 'deep' ? 'ตรวจสอบ' : 'ดึงข้อมูล';
-                articleEl.innerText = `📄 [${artIndex}/${artTotal}] ${action}: "${currentArticleTitle.substring(0, 30)}..."`;
+                const cleanName = normalizeName(currentAuthorName);
+
+                articleEl.innerHTML = `
+                    <div style="color:#ccc;">📄 [${artIndex}/${artTotal}] ${action}: "${currentArticleTitle.substring(0, 30)}..."</div>
+                    <div style="color:#f1c40f; font-size:11px; margin-top:3px; border-top:1px dashed #555; padding-top:3px;">
+                        🔍: <span style="color:#fff;">${currentAuthorName}</span> ➔ <span style="color:#00ff00;">${cleanName}</span>
+                    </div>
+                `;
             }
         }
     }
@@ -321,29 +328,48 @@
 
     function checkNameMatch(mainAuthor, articleAuthors) {
         if (!articleAuthors || articleAuthors === "ไม่ระบุ") return false;
-        
+
         const cleanMain = normalizeName(mainAuthor);
-        
-        const cleanArticleAuths = normalizeName(articleAuthors);
-        
-        return cleanArticleAuths.includes(cleanMain);
+        const cleanArticle = normalizeName(articleAuthors);
+
+        // 1. เช็คตรงตัว
+        if (cleanArticle.includes(cleanMain)) return true;
+
+        // 2. เช็คแบบสลับที่ (Surname First)
+        const p = cleanMain.split(' ');
+        if (p.length >= 2) {
+            const reversedName = `${p[p.length - 1]} ${p.slice(0, p.length - 1).join(' ')}`;
+            if (cleanArticle.includes(reversedName)) return true;
+
+            // 3. เช็คชื่อย่อแบบปกติและสลับที่
+            const firstInit = p[0].charAt(0);
+            const lastName = p[p.length - 1];
+            const reg1 = new RegExp(`\\b${firstInit}\\s+${lastName}\\b`, 'i');
+            const reg2 = new RegExp(`\\b${lastName}\\s+${firstInit}\\b`, 'i');
+            if (reg1.test(cleanArticle) || reg2.test(cleanArticle)) return true;
+        }
+        return false;
     }
 
     function normalizeName(name) {
         if (!name) return "";
         let n = name.toLowerCase();
 
-        if (n.includes(',')) {
-        }
+        // 1. ลบ URL และสิ่งที่อยู่ในวงเล็บออกไปก่อนเลย
+        n = n.replace(/http\S+/g, '');
+        n = n.replace(/\(.*?\)/g, '');
 
-        const prefixes = /^(mr\.|mrs\.|ms\.|dr\.|prof\.|asst\.|assoc\.|นาย|นาง|นางสาว|ดร\.|ผศ\.|รศ\.|ศ\.|อาจารย์|พล\.?t\.?|pol\.?)\s*/i;
-        n = n.replace(prefixes, '');
+        // 2. ลบจุด คอมม่า และเปลี่ยนขีดกลางเป็นช่องว่าง
+        n = n.replace(/[.,()\-]/g, ' ');
 
-        const suffixes = /\b(ph\.d\.|ed\.d\.|m\.sc\.|b\.sc\.|b\.a\.|m\.a\.|d\.phil\.|f\.r\.s\.|post-doc|candidate)\b/gi;
-        n = n.replace(suffixes, '');
+        // 3. ลบตัวเลข (เพื่อกำจัดเลข ORCID ที่หลงเหลือ)
+        n = n.replace(/\d+/g, ' ');
 
-        n = n.replace(/[.,]/g, '');
-        
+        // 4. ล้างตำแหน่งวิชาการ (ใช้ Junk ชุดใหญ่เดิม)
+        const junk = /\b(assistant|associate|professor|lecturer|emeritus|adjunct|clinical|visiting|research|scholar|fellow|staff|senior|junior|prof|asst|assoc|lect|dr|ph\s*d|phd|ed\s*d|m\s*sc|b\s*sc|m\s*eng|b\s*eng|d\s*phil|d\s*eng|md|m\s*a|b\s*a|post\s*doc|candidate|mr|mrs|ms|นาย|นาง|นางสาว|ดร|ผศ|รศ|ศ|อาจารย์|อ|นพ|พญ|ว่าที่\s*รต|พท|พต|พจ|พตอ|พล\s*ต|พล\s*ท|พล\s*เอก|ผู้ช่วยศาสตราจารย์|รองศาสตราจารย์|ศาสตราจารย์|อาจารย์พิเศษ|นักวิจัย|ผู้ช่วยวิจัย)\b/gi;
+        n = n.replace(junk, '');
+
+        // 5. ยุบช่องว่างให้เหลือ 1 ช่อง
         n = n.replace(/\s+/g, ' ');
         return n.trim();
     }
