@@ -321,8 +321,11 @@
 
     function checkNameMatch(mainAuthor, articleAuthors) {
         if (!articleAuthors || articleAuthors === "ไม่ระบุ") return false;
+        
         const cleanMain = normalizeName(mainAuthor);
+        
         const cleanArticleAuths = normalizeName(articleAuthors);
+        
         return cleanArticleAuths.includes(cleanMain);
     }
 
@@ -331,13 +334,12 @@
         let n = name.toLowerCase();
 
         if (n.includes(',')) {
-            n = n.split(',')[0]; 
         }
 
         const prefixes = /^(mr\.|mrs\.|ms\.|dr\.|prof\.|asst\.|assoc\.|นาย|นาง|นางสาว|ดร\.|ผศ\.|รศ\.|ศ\.|อาจารย์|พล\.?t\.?|pol\.?)\s*/i;
         n = n.replace(prefixes, '');
 
-        const suffixes = /\s*(ph\.d\.|ed\.d\.|m\.sc\.|b\.sc\.|b\.a\.|m\.a\.|d\.phil\.|f\.r\.s\.)/gi;
+        const suffixes = /\b(ph\.d\.|ed\.d\.|m\.sc\.|b\.sc\.|b\.a\.|m\.a\.|d\.phil\.|f\.r\.s\.|post-doc|candidate)\b/gi;
         n = n.replace(suffixes, '');
 
         n = n.replace(/[.,]/g, '');
