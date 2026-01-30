@@ -329,9 +329,19 @@
     function normalizeName(name) {
         if (!name) return "";
         let n = name.toLowerCase();
+
+        if (n.includes(',')) {
+            n = n.split(',')[0]; 
+        }
+
         const prefixes = /^(mr\.|mrs\.|ms\.|dr\.|prof\.|asst\.|assoc\.|นาย|นาง|นางสาว|ดร\.|ผศ\.|รศ\.|ศ\.|อาจารย์|พล\.?t\.?|pol\.?)\s*/i;
         n = n.replace(prefixes, '');
+
+        const suffixes = /\s*(ph\.d\.|ed\.d\.|m\.sc\.|b\.sc\.|b\.a\.|m\.a\.|d\.phil\.|f\.r\.s\.)/gi;
+        n = n.replace(suffixes, '');
+
         n = n.replace(/[.,]/g, '');
+        
         n = n.replace(/\s+/g, ' ');
         return n.trim();
     }
